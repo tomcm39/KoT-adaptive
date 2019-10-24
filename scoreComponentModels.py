@@ -6,6 +6,10 @@ import pandas as pd
 
 from epiweeks import Week, Year
 
+def timeStamp():
+    import datetime
+    return datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+
 def computeTargetILIepiWeek(forecastWeek,weekAhead):
     iliYear,iliWeek = int(str(forecastWeek)[:3+1]),int(str(forecastWeek)[4:])
     iliEW = Week(iliYear,iliWeek)-2 + int(weekAhead)

@@ -2,7 +2,7 @@
 
 PYTHON := python3
 
-runAll: updatedata updateFluSight moveFluSightForecasts2CurrentDir
+runAll: updatedata updateFluSight moveFluSightForecasts2CurrentDir scoreComponentModels
 
 updatedata:
 	mkdir -p data && mkdir -p historicalData &&\
