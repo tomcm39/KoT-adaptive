@@ -10,4 +10,4 @@ The KoT-adaptive ensemble uses a 10% prior regularization.
 
 Interested readers can find the methodological detils [here](https://arxiv.org/abs/1908.01675)
 
-
+The workflow for this repository can be found[here](https://github.com/tomcm39/KoT-adaptive/blob/master/Makefile)
