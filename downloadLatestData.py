@@ -21,10 +21,8 @@ def computeEpiWeeksWithData(firstWeekOfSeason):
 
     week    = firstWeekOfSeason
     epiWeeks = [fromDateTime2EW(firstWeekOfSeason)]
-    while True:
+    while week<thisWeek:
         week = week + _1Week
-        if week > thisWeek:
-            break
         epiWeeks.append(fromDateTime2EW(week))
     epiWeeks = epiWeeks[:-2] # ILINET is 2 weeks behind the current Epidemic Week.
     return epiWeeks

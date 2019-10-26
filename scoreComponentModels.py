@@ -12,7 +12,7 @@ def timeStamp():
 
 def computeTargetILIepiWeek(forecastWeek,weekAhead):
     iliYear,iliWeek = int(str(forecastWeek)[:3+1]),int(str(forecastWeek)[4:])
-    iliEW = Week(iliYear,iliWeek)-2 + int(weekAhead)
+    iliEW = Week(iliYear,iliWeek) + int(weekAhead)
     iliEW = int("{:04d}{:02d}".format(iliEW.year,iliEW.week))
     return iliEW
 
@@ -27,13 +27,23 @@ def subsetAllForecasts2WeekAheadTargets(forecasts):
     return weekAheadForecasts
 
 def computeLogScores(forecastsAndILI):
-        subsetToProbabilities = forecastsAndILI.loc[  (forecastsAndILI.bin_start_incl <= forecastsAndILI.wili)
-                                                    & (forecastsAndILI.bin_end_notincl > forecastsAndILI.wili),: ]
-        subsetToProbabilities['logScore'] = np.log(subsetToProbabilities.value)
-        logScores = subsetToProbabilities.loc[:,['model','location','target','region','logScore']]
-        logScores['surveillanceWeek'] = forecastWeek
-        logScores['targetWeek']       = iliEW 
-        return logScores
+    from datetime import datetime
+    calendarEW = Week.thisweek()
+    dayOfWeek  = datetime.today().weekday
+    if dayOfWeek in {5,6}: # Saturday or Sunday
+        calendarWeek = "{:d}{:d}".format(calendarEW.year,calendarEW.week+1) # should be referenced from the next week
+    else:
+        calendarWeek = "{:d}{:d}".format(calendarEW.year,calendarEW.week)
+
+    subsetToProbabilities = forecastsAndILI.loc[  (forecastsAndILI.bin_start_incl <= forecastsAndILI.wili)
+                                                  & (forecastsAndILI.bin_end_notincl > forecastsAndILI.wili),: ]
+    subsetToProbabilities['logScore'] = np.log(subsetToProbabilities.value)
+    logScores = subsetToProbabilities.loc[:,['model','location','target','region','logScore']]
+    logScores['surveillanceWeek'] = forecastWeek  # this is the most recent week of data available
+    logScores['calendarWeek']     = calendarWeek  # this is the present week in real-time
+    logScores['targetWeek']       = iliEW         # this is the target week of forecasting
+    
+    return logScores
 
 if __name__ == "__main__":
 
@@ -42,7 +52,7 @@ if __name__ == "__main__":
     forecasts = removePointForecasts(forecasts)
 
     epiWeeksWithData   = iliData.EW.unique()
-    forecastedEpiWeeks = forecasts.EW.unique()
+    forecastedEpiWeeks = sorted(forecasts.EW.unique())
     
     # week aheads 
     weekAheadForecasts = subsetAllForecasts2WeekAheadTargets(forecasts)
@@ -59,7 +69,9 @@ if __name__ == "__main__":
             iliEW = computeTargetILIepiWeek(forecastWeek,weekAhead)
             iliDataForEW = iliData.loc[iliData.EW==iliEW,:]
             
-            forecastsAndILI = forecastsForSingleWeekAheadTarget.merge( iliDataForEW, left_on = ['location'], right_on=['region']   )
+            forecastsAndILI = forecastsForSingleWeekAheadTarget.merge( iliDataForEW
+                                                                       ,left_on = ['location']
+                                                                       ,right_on=['region'])
 
             logScores = computeLogScores(forecastsAndILI)
             allLogScores = allLogScores.append(logScores)

@@ -29,8 +29,7 @@ if __name__ == "__main__":
     
     allForecasts = pd.DataFrame()
     for model in os.listdir(FLUSIGHTDIR):
-        sys.stdout.write('\r')
-        sys.stdout.write('\r{:s}\r'.format(model))
+        sys.stdout.write('\x1b[2K\r{:s}'.format(model))
         sys.stdout.flush()
         forecasts = pd.DataFrame()
         for forecastFile in glob('{:s}/{:s}/*'.format(FLUSIGHTDIR,model)):

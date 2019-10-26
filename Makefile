@@ -1,8 +1,15 @@
 #mcandrew;
 
-PYTHON := python3
+PYTHON := python3 -W ignore
+R := Rscript --vanilla
 
-runAll: updatedata updateFluSight moveFluSightForecasts2CurrentDir scoreComponentModels
+runAll: updatedata\
+	updateFluSight\
+	moveFluSightForecasts2CurrentDir\
+	scoreComponentModels\
+	assignWeights2ComponentModels\
+	produceEnsembleForecast\
+	validateEnsembleForecast
 
 updatedata:
 	mkdir -p data && mkdir -p historicalData &&\
@@ -20,4 +27,18 @@ moveFluSightForecasts2CurrentDir:
 
 scoreComponentModels:
 	mkdir -p historicalScores && mkdir -p scores &&\
-	$(PYTHON) scoreComponentModels.py
+	$(PYTHON) scoreComponentModels.py &&\
+	echo "Component models scored"
+
+assignWeights2ComponentModels:
+	mkdir -p historicalWeights && mkdir -p weights &&\
+	$(PYTHON) computeAdaptiveEnsembleWeights.py --prior 10 &&\
+	echo "Adaptive ensemble weights assigned"
+
+produceEnsembleForecast:
+	mkdir -p historicalEnsembleForecasts && mkdir -p ensembleForecasts &&\
+	$(PYTHON) produceEnsembleForecast.py &&\
+	echo "Adaptive Ensemble Forecast produced"
+
+validateEnsembleForecast:
+	$(R) validateSubmission.R
