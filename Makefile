@@ -30,6 +30,11 @@ scoreComponentModels:
 	$(PYTHON) scoreComponentModels.py &&\
 	echo "Component models scored"
 
+createListOfExcludedModelsFromEnsemble:
+	mkdir -p historicalExcludedModels && mkdir -p excludedModels && \
+	$(PYTHON) createSetOfExcludedModels.py && \
+	echo "created set of excluded models"
+
 assignWeights2ComponentModels:
 	mkdir -p historicalWeights && mkdir -p weights &&\
 	$(PYTHON) computeAdaptiveEnsembleWeights.py --prior 10 &&\
