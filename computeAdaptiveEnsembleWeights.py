@@ -14,8 +14,18 @@ def timeStamp():
     return datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 
 def removeEnsembleModels(d):
-    models = d.model.unique()
-    return d.loc[ ~d.model.str.match("FSNetwork"),:]
+    excludedModels = pd.read_csv('./excludedModels/excludedModels.csv')
+    d = d.merge(excludedModels, left_on='model',right_on='model')
+    d = d.loc[d.excluded==0,:]
+    return d
+
+def countNumOfExcludedModels():
+    excludedModels = pd.read_csv('./excludedModels/excludedModels.csv')
+    return excludedModels.excluded.sum()
+
+def createListOfExcludedModels():
+    excludedModels = pd.read_csv('./excludedModels/excludedModels.csv')
+    return list(excludedModels.loc[excludedModels.excluded==1,'model'])
 
 def countNumberOfUniqueModels(d):
     return len(d.model.unique())
@@ -66,7 +76,8 @@ if __name__ == "__main__":
     data = {'component_model_id':[],'weight':[]}
 
     if singleBinLogScores.shape[0]==0:
-        modelNames = list(pd.read_csv('./forecasts/fluSightForecasts.csv').model.unique())
+        excludedModels = set(createListOfExcludedModels())
+        modelNames = list( set(pd.read_csv('./forecasts/fluSightForecasts.csv').model.unique()) - excludedModels)
         numberOfModels = len(modelNames)
         pis = [1./numberOfModels for x in range(numberOfModels)]
     else:
@@ -90,6 +101,12 @@ if __name__ == "__main__":
     for (model,pi) in zip(modelNames, pis):
         data['component_model_id'].append(model)
         data['weight'].append(float(pi))
+
+    excludedModels = createListOfExcludedModels()
+    for model in excludedModels:
+        data['component_model_id'].append(model)
+        data['weight'].append(0.)
+        
     data = pd.DataFrame(data)
     
     data.to_csv('./historicalWeights/adaptive-regularized-ensemble-constant_{:s}.csv'.format(timeStamp()),index=False)

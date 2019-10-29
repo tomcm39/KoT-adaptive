@@ -11,6 +11,24 @@ def computeMostRecentSurvWeek():
 def cap2MostRecentSurvWeek(d,MRW):
     return d.loc[d.EW==MRW,:]
 
+def formatBins(d):
+    reformatted = [] 
+    for x in d.loc[:,'bin_start_incl']:
+        try:
+            reformatted.append(float(x))
+        except:
+            reformatted.append(x)
+    d.loc[:,'bin_start_incl'] = [str(x) for x in reformatted]
+
+    reformatted = []
+    for x in d.loc[:,'bin_end_notincl']:
+        try:
+            reformatted.append(float(x))
+        except:
+            reformatted.append(x)
+    d.loc[:,'bin_end_notincl'] = [str(x) for x in reformatted]
+    return d
+    
 def formatEnsembleForecast(d):
 
     d = d.rename(columns = {'location':'Location'
@@ -35,7 +53,9 @@ def captureSubmissionInformation(mostRecentSurviellanceWeek):
 
 if __name__ == "__main__":
 
-    forecasts = pd.read_csv('./forecasts/fluSightForecasts.csv')
+    forecasts = pd.read_csv('./forecasts/fluSightForecasts.csv') 
+    forecasts = formatBins(forecasts)
+    
     weights   = pd.read_csv('./weights/adaptive-regularized-ensemble-constant.csv')
 
     mostRecentSurviellanceWeek = computeMostRecentSurvWeek()
@@ -44,6 +64,8 @@ if __name__ == "__main__":
     forecastsAndWeights = cap2MostRecentSurvWeek(forecastsAndWeights,mostRecentSurviellanceWeek)
 
     forecastsAndWeights['ensembleForecast'] = forecastsAndWeights.weight*forecastsAndWeights.value
+    forecastsAndWeights = forecastsAndWeights.groupby(['location','target','type','unit','bin_start_incl','bin_end_notincl']).apply( lambda x: pd.Series({'ensembleForecast':x.ensembleForecast.sum()}) ).reset_index()
+    
     ensembleForecast = formatEnsembleForecast(forecastsAndWeights)
 
     EW,year,month,day = captureSubmissionInformation(mostRecentSurviellanceWeek)

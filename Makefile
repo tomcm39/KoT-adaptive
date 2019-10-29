@@ -2,6 +2,7 @@
 
 PYTHON := python3 -W ignore
 R := Rscript --vanilla
+CDCEPIREPO := ../FluSight-forecasts/
 
 runAll: updatedata\
 	updateFluSight\
@@ -17,7 +18,7 @@ updatedata:
 	echo "Latest Data Downloaded"
 
 updateFluSight:
-	git -C ../FluSight-forecasts/ pull &&\
+	git -C $(CDCEPIREPO) pull &&\
 	echo "Updated FluSight Repository"
 
 moveFluSightForecasts2CurrentDir:
