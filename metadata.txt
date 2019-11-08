@@ -1,0 +1,11 @@
+team_name: KoT-adaptive
+team_members: 'Thomas McAndrew, Nicholas G. Reich'
+model_name: KoT-adaptive
+model_abbr: KoTA
+anonymity: named
+data_source1: other models
+data_source2: NULL
+this_model_is_an_ensemble: TRUE
+methods: >-
+  This is a weighted combination of predictive densities.
+  We use a variational inference algorithm to compute component model weights and an equally-weighted Dirichlet prior to shrink weights towards an equal weighted average.
