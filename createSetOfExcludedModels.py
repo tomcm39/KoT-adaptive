@@ -12,7 +12,7 @@ if __name__ == "__main__":
 
     models = pd.read_csv('./forecasts/fluSightForecasts.csv')['model'].unique()
 
-    excluded = { 'FluSightNetwork','UnwghtAvg','Hist-Avg'}
+    excluded = { 'FluSightNetwork','UnwghtAvg','Hist-Avg','KISTI(CSB)_26weeks','KoT-adaptive'}
     exclusionList = [ 1 if model in excluded else 0 for model in models  ]
 
     excludedDataFrame = pd.DataFrame( {'model':models,'excluded':exclusionList} )

@@ -51,6 +51,24 @@ def captureSubmissionInformation(mostRecentSurviellanceWeek):
     year,month,day  = today.year,today.month,today.day
     return EW,year,month,day
 
+def renormalizeWeightsForModelsThatDontSubmit(d):
+        subsetModelsWeights = d.loc[:,['model','weight']].drop_duplicates()
+
+        print("Sum of weights before renorm = {:f}".format(subsetModelsWeights.weight.sum()))
+        
+        subsetModelsWeights = subsetModelsWeights.rename(columns={'weight':'renormWeight'})
+        
+        sumWeights = subsetModelsWeights.renormWeight.sum()
+        subsetModelsWeights['renormWeight'] = subsetModelsWeights.renormWeight/sumWeights
+        
+        d = d.merge(subsetModelsWeights, left_on=['model'], right_on=['model'])
+        d = d.drop(columns = ['weight'])
+        d = d.rename(columns = {'renormWeight':'weight'})
+
+        print("Sum of weights after renorm = {:f}".format(d.loc[:,['model','weight']].drop_duplicates().weight.sum()))
+        
+        return d
+
 if __name__ == "__main__":
 
     forecasts = pd.read_csv('./forecasts/fluSightForecasts.csv') 
@@ -62,6 +80,7 @@ if __name__ == "__main__":
 
     forecastsAndWeights = forecasts.merge(weights, left_on=['model'],right_on=['component_model_id']) 
     forecastsAndWeights = cap2MostRecentSurvWeek(forecastsAndWeights,mostRecentSurviellanceWeek)
+    forecastsAndWeights = renormalizeWeightsForModelsThatDontSubmit(forecastsAndWeights) 
 
     forecastsAndWeights['ensembleForecast'] = forecastsAndWeights.weight*forecastsAndWeights.value
     forecastsAndWeights = forecastsAndWeights.groupby(['location','target','type','unit','bin_start_incl','bin_end_notincl']).apply( lambda x: pd.Series({'ensembleForecast':x.ensembleForecast.sum()}) ).reset_index()

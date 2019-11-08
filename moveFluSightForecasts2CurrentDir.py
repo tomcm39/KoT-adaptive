@@ -20,6 +20,11 @@ def condenseLocationInfo(d):
     d.loc[d.location=='US National','location'] = 'nat'
     return d
 
+def columns2LowerCase(d):
+    toLowerCase = { c:c.lower()  for c in d.columns }
+    d = d.rename(columns = toLowerCase)
+    return d
+
 def timeStamp():
     import datetime
     return datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
@@ -33,7 +38,8 @@ if __name__ == "__main__":
         sys.stdout.flush()
         forecasts = pd.DataFrame()
         for forecastFile in glob('{:s}/{:s}/*'.format(FLUSIGHTDIR,model)):
-            forecast = pd.read_csv(forecastFile)
+            forecast  = pd.read_csv(forecastFile)
+            forecast  = columns2LowerCase(forecast)
             forecast['EW'] = grabEW(forecastFile,2019) 
 
             forecasts = forecasts.append(forecast)

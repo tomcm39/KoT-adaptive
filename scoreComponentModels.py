@@ -20,6 +20,10 @@ def removePointForecasts(forecasts):
     forecasts = forecasts.loc[forecasts.type!='Point',:]
     return forecasts
 
+def removeExtraneousExtraRows(forecasts):
+   forecasts = forecasts.loc[ ~pd.isna(forecasts.bin_start_incl),:]   
+   return forecasts
+
 def subsetAllForecasts2WeekAheadTargets(forecasts):
     weekAheadForecasts = forecasts.loc[ forecasts.target.str.contains('ahead'),: ]
     weekAheadForecasts.bin_start_incl  = weekAheadForecasts.bin_start_incl.astype(float)
@@ -50,9 +54,10 @@ if __name__ == "__main__":
     iliData   = pd.read_csv('./data/epiData.csv')
     forecasts = pd.read_csv('./forecasts/fluSightForecasts.csv')
     forecasts = removePointForecasts(forecasts)
+    forecasts = removeExtraneousExtraRows(forecasts)
 
     epiWeeksWithData   = iliData.EW.unique()
-    forecastedEpiWeeks = sorted(forecasts.EW.unique())
+    forecastedEpiWeeks = sorted(forecasts.EW.astype(int).unique())
     
     # week aheads 
     weekAheadForecasts = subsetAllForecasts2WeekAheadTargets(forecasts)
@@ -76,5 +81,6 @@ if __name__ == "__main__":
             logScores = computeLogScores(forecastsAndILI)
             allLogScores = allLogScores.append(logScores)
 
+    allLogScores = allLogScores.replace(-np.Inf,-10.0)
     allLogScores.to_csv('./historicalScores/allLogScores_{:s}.csv'.format(timeStamp()),index=False)
     allLogScores.to_csv('./scores/logScores.csv',index=False)
