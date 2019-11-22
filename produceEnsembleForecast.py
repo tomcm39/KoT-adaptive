@@ -67,8 +67,11 @@ def sortEnsembleForecast(d):
     d['Bin_end_notincl'] = d.Bin_end_notincl.astype(float)
     d = d.sort_values(['Location','Target','Type','Bin_start_incl','Bin_end_notincl'])
 
-    d.loc[d.Bin_start_incl ==-1.,'Bin_start_incl'] = 'none'
-    d.loc[d.Bin_end_notincl==-2.,'Bin_end_notincl'] = 'none'
+    d['Bin_start_incl'] = d.Bin_start_incl.astype(str)
+    d['Bin_end_notincl'] = d.Bin_end_notincl.astype(str)
+    
+    d.loc[d.Bin_start_incl =='-1','Bin_start_incl']  = 'none'
+    d.loc[d.Bin_end_notincl=='-2','Bin_end_notincl'] = 'none'
         
     return d
 
@@ -113,6 +116,7 @@ if __name__ == "__main__":
     forecastsAndWeights = forecastsAndWeights.groupby(['location','target','type','unit','bin_start_incl','bin_end_notincl']).apply( lambda x: pd.Series({'ensembleForecast':x.ensembleForecast.sum()}) ).reset_index()
     
     ensembleForecast = formatEnsembleForecast(forecastsAndWeights)
+    ensembleForecast = sortEnsembleForecast(ensembleForecast)
 
     EW,year,month,day = captureSubmissionInformation(mostRecentSurviellanceWeek)
     ensembleForecast.to_csv('./ensembleForecasts/EW{:02d}-KoT-adaptive-{:d}-{:d}-{:d}.csv'.format(EW,year,month,day),index=False)
