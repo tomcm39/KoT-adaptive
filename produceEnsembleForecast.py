@@ -45,6 +45,33 @@ def formatEnsembleForecast(d):
     
     return d.loc[:,['Location','Target','Type','Unit','Bin_start_incl','Bin_end_notincl','Value']  ]
 
+def sortEnsembleForecast(d):
+        
+    leftBin = []
+    for x in d.Bin_start_incl:
+        if x=='none':
+            leftBin.append(-1.)
+        else:
+            leftBin.append(float(x))
+    d['Bin_start_incl'] = leftBin
+
+    rightBin = []
+    for x in d.Bin_end_notincl:
+        if x=='none':
+            rightBin.append(-2.)
+        else:
+            rightBin.append(float(x))
+    d['Bin_end_notincl'] = rightBin
+    
+    d['Bin_start_incl']  = d.Bin_start_incl.astype(float)
+    d['Bin_end_notincl'] = d.Bin_end_notincl.astype(float)
+    d = d.sort_values(['Location','Target','Type','Bin_start_incl','Bin_end_notincl'])
+
+    d.loc[d.Bin_start_incl ==-1.,'Bin_start_incl'] = 'none'
+    d.loc[d.Bin_end_notincl==-2.,'Bin_end_notincl'] = 'none'
+        
+    return d
+
 def captureSubmissionInformation(mostRecentSurviellanceWeek):
     EW = int(str(mostRecentSurviellanceWeek)[4:])
     today = datetime.datetime.today()
