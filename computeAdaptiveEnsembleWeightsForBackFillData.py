@@ -68,26 +68,19 @@ def trainRegularizedStaticEnsemble(d,PRIOR):
                            ,relDiffThreshold = -1)
     return alphas
 
-if __name__ == "__main__":
 
-    singleBinLogScores = pd.read_csv('./scores/logScores.csv')
-    singleBinLogScores = removeEnsembleModels(singleBinLogScores)
+def computeAdaptiveWeights(singleBinLogScores):
 
     data = {'component_model_id':[],'weight':[]}
-
     if singleBinLogScores.shape[0]==0:
         excludedModels = set(createListOfExcludedModels())
         modelNames = list( set(pd.read_csv('./forecasts/fluSightForecasts.csv').model.unique()) - excludedModels)
+        modelNamesNoNA = modelNames
         numberOfModels = len(modelNames)
         pis = [1./numberOfModels for x in range(numberOfModels)]
     else:
         numberOfModels = countNumberOfUniqueModels(singleBinLogScores)
-
-        parser = argparse.ArgumentParser(description='Set regularization percentage')
-        parser.add_argument('--prior',help='the prior percentage, a number between 0 and 1',default=0.10)
-        args = parser.parse_args()
-        
-        priorPercent = float(args.prior)
+        priorPercent = float(0.10)
 
         allRegionTargetData = singleBinLogScores
         allRegionTargetData = capLogScoresAtNeg10(allRegionTargetData) 
@@ -114,6 +107,26 @@ if __name__ == "__main__":
         data['weight'].append(0.)
         
     data = pd.DataFrame(data)
-    
-    data.to_csv('./historicalWeights/adaptive-regularized-ensemble-constant_{:s}.csv'.format(timeStamp()),index=False)
-    data.to_csv('./weights/adaptive-regularized-ensemble-constant.csv',index=False)
+    return data
+
+def grabForecastWeeks():
+    return [int(x) for x in sorted(pd.read_csv('forecasts/fluSightForecasts.csv')['EW'].unique())]
+
+if __name__ == "__main__":
+
+    singleBinLogScores = pd.read_csv('./backFillScores/logScores.csv')
+    singleBinLogScores = removeEnsembleModels(singleBinLogScores)
+
+    allWts = pd.DataFrame()
+    for forecastWeek in grabForecastWeeks():
+        sys.stdout.write('\rForecast Week = {:d}\r'.format(forecastWeek))
+        sys.stdout.flush()
+        logScores = singleBinLogScores[singleBinLogScores.releaseEW==forecastWeek]
+        
+        weights = computeAdaptiveWeights(logScores)
+        weights['forecastWeek'] = forecastWeek
+
+        allWts = allWts.append(weights)
+        
+    allWts.to_csv('./historicalWeightsBackfill/adaptive-regularized-ensemble-constant_{:s}.csv'.format(timeStamp()),index=False)
+    allWts.to_csv('./weightsBackFill/adaptive-regularized-ensemble-constant.csv',index=False)

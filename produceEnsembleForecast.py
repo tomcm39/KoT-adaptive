@@ -106,12 +106,18 @@ if __name__ == "__main__":
     
     weights   = pd.read_csv('./weights/adaptive-regularized-ensemble-constant.csv')
 
-    mostRecentSurviellanceWeek = computeMostRecentSurvWeek()
-
+    mostRecentSurviellanceWeek = 201945
     forecastsAndWeights = forecasts.merge(weights, left_on=['model'],right_on=['component_model_id']) 
-    forecastsAndWeights = cap2MostRecentSurvWeek(forecastsAndWeights,mostRecentSurviellanceWeek)
+
+    try:
+        forecastsAndWeights = cap2MostRecentSurvWeek(forecastsAndWeights,mostRecentSurviellanceWeek)
+    except NameError:
+        mostRecentSurviellanceWeek = computeMostRecentSurvWeek()
+        forecastsAndWeights = cap2MostRecentSurvWeek(forecastsAndWeights,mostRecentSurviellanceWeek)
+            
     forecastsAndWeights = renormalizeWeightsForModelsThatDontSubmit(forecastsAndWeights) 
 
+    forecastsAndWeights.value = forecastsAndWeights.value.astype(float)
     forecastsAndWeights['ensembleForecast'] = forecastsAndWeights.weight*forecastsAndWeights.value
     forecastsAndWeights = forecastsAndWeights.groupby(['location','target','type','unit','bin_start_incl','bin_end_notincl']).apply( lambda x: pd.Series({'ensembleForecast':x.ensembleForecast.sum()}) ).reset_index()
     

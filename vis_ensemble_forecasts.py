@@ -13,7 +13,7 @@ def fromDateTime2EW(dt):
     return "{:4}{:2}".format(w.year,w.week)
 
 def computeTargetILIepiWeek(row):
-    forecastWeek = row.surveillanceWeek
+    forecastWeek = int(row.surveillanceWeek)
     weekAhead = int(row.Target.replace(' wk ahead',''))
     iliYear,iliWeek = int(str(forecastWeek)[:3+1]),int(str(forecastWeek)[4:])
     iliEW = Week(iliYear,iliWeek) + int(weekAhead)
@@ -33,10 +33,9 @@ def reformat_region(row):
 def mm2inch(x):
     return x/25.4
 
-
 if __name__ == "__main__":
 
-    ensembleForecasts = pd.read_csv('./ensembleForecastsForAllEW/EW43-KoT-adaptive-2019-11-5.csv')
+    ensembleForecasts = pd.read_csv('./ensembleForecastsForAllEW/EW45-KoT-adaptive-2019-11-22.csv')
     
     iliData = pd.read_csv('./data/epiData.csv')
     iliData = iliData.apply( reformat_region,1 )
@@ -48,7 +47,6 @@ if __name__ == "__main__":
     ensembleForecastsPoint = ensembleForecastsPoint.apply(computeTargetILIepiWeek,1)
     
     ensembleAndTruth = ensembleForecastsPoint.merge(iliData,left_on = ['targetWeek','Location'], right_on = ['EW','Location']) 
-
 
     for EW in list(ensembleAndTruth.surveillanceWeek.unique()):
         i,j=0,0
@@ -87,7 +85,6 @@ if __name__ == "__main__":
                     pass
                 j+=1
             i+=1
-
         fig.set_size_inches(mm2inch(183),mm2inch(183)/1.5)
-        plt.savefig('./vis/vis_forecastCheck_survWeek_{:d}.pdf'.format(EW))
+        plt.savefig('./vis/vis_forecastCheck_survWeek_{:d}.pdf'.format(int(EW)))
         plt.close()
