@@ -99,6 +99,10 @@ def renormalizeWeightsForModelsThatDontSubmit(d):
         
         return d
 
+def removeHashValueFromValues(forecastsAndWeights):
+    forecastsAndWeights['value'] = [ np.nan if x=='#VALUE!' else float(x) for x in forecastsAndWeights.value]
+    return forecastsAndWeights
+
 if __name__ == "__main__":
 
     forecasts = pd.read_csv('./forecasts/fluSightForecasts.csv') 
@@ -116,7 +120,8 @@ if __name__ == "__main__":
         forecastsAndWeights = cap2MostRecentSurvWeek(forecastsAndWeights,mostRecentSurviellanceWeek)
             
     forecastsAndWeights = renormalizeWeightsForModelsThatDontSubmit(forecastsAndWeights) 
-
+    
+    forecastsAndWeights = removeHashValueFromValues(forecastsAndWeights)
     forecastsAndWeights.value = forecastsAndWeights.value.astype(float)
     forecastsAndWeights['ensembleForecast'] = forecastsAndWeights.weight*forecastsAndWeights.value
     forecastsAndWeights = forecastsAndWeights.groupby(['location','target','type','unit','bin_start_incl','bin_end_notincl']).apply( lambda x: pd.Series({'ensembleForecast':x.ensembleForecast.sum()}) ).reset_index()
