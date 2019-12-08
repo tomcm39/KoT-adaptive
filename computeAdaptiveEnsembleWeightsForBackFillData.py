@@ -110,8 +110,16 @@ def computeAdaptiveWeights(singleBinLogScores):
     return data
 
 def grabForecastWeeks():
-    return [int(x) for x in sorted(pd.read_csv('forecasts/fluSightForecasts.csv')['EW'].unique())]
-
+    from epiweeks import Week, Year
+    thisWeek = Week.thisweek()
+    
+    weeks = [Week(2019,40)]
+    while weeks[-1] < thisWeek:
+        weeks.append(weeks[-1]+1)
+    formattedWeeks = [ int("{:04d}{:02d}".format(x.year,x.week)) for x in weeks]
+    return formattedWeeks
+ 
+    
 if __name__ == "__main__":
 
     singleBinLogScores = pd.read_csv('./backFillScores/logScores.csv')
@@ -121,6 +129,7 @@ if __name__ == "__main__":
     for forecastWeek in grabForecastWeeks():
         sys.stdout.write('\rForecast Week = {:d}\r'.format(forecastWeek))
         sys.stdout.flush()
+        print('\rForecast Week = {:d}\r'.format(forecastWeek))
         logScores = singleBinLogScores[singleBinLogScores.releaseEW==forecastWeek]
         
         weights = computeAdaptiveWeights(logScores)

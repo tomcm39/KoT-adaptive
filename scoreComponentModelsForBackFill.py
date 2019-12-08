@@ -54,7 +54,7 @@ def computeLogScores(forecastsAndILI,forecastWeek,iliEW):
 
 if __name__ == "__main__":
 
-    iliData   = pd.read_csv('./backfilldata/epiData.csv')
+    iliData   = pd.read_csv('./backfillData/epiData.csv')
 
     forecasts = pd.read_csv('./forecasts/fluSightForecasts.csv')
     forecasts = removePointForecasts(forecasts)

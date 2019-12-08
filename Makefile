@@ -13,8 +13,7 @@ runAll: updatedata\
 	produceEnsembleForecast\
 	validateEnsembleForecast\
 	runChecks\
-	downloadBackFillILIs\
-	computeMockWeights4Prior0
+	turnBackTime
 
 updatedata:
 	mkdir -p data && mkdir -p historicalData &&\
@@ -65,6 +64,9 @@ runChecks:
 	echo "Completed forecast checks"
 
 # Wind back clock and compute all forecasts and weights
+turnBackTime: downloadBackFillILIs scoreComponentModelsBackFill \
+	      computeAdaptiveEnsembleWeightsForBackFillData produceCompleteEnsembleForecasts
+
 downloadBackFillILIs:
 	mkdir -p historicalBackfillData && mkdir -p backfillData && \
 	$(PYTHON) downloadBackfillAndLatestData.py && \

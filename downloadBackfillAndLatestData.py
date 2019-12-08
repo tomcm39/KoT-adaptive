@@ -54,7 +54,7 @@ if __name__ == "__main__":
         if fluData['message'] != 'success':
             print('could not download data-lag={:d}'.format(lag))
             continue
-        
+        print('Downloading data-lag={:d}'.format(lag))
         for data in fluData['epidata']:
             mostRecentEpiData['EW'].append(data['epiweek'])
             mostRecentEpiData['region'].append(data['region'])

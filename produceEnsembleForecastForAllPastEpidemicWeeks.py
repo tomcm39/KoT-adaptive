@@ -150,6 +150,24 @@ def formatEnsembleForecast(d):
     
     return d.loc[:,['EW','Location','Target','Type','Unit','Bin_start_incl','Bin_end_notincl','Value']  ]
 
+def renormalizeWeightsForModelsThatDontSubmit(d):
+        subsetModelsWeights = d.loc[:,['model','weight']].drop_duplicates()
+
+        print("Sum of weights before renorm = {:f}".format(subsetModelsWeights.weight.sum()))
+        
+        subsetModelsWeights = subsetModelsWeights.rename(columns={'weight':'renormWeight'})
+        
+        sumWeights = subsetModelsWeights.renormWeight.sum()
+        subsetModelsWeights['renormWeight'] = subsetModelsWeights.renormWeight/sumWeights
+        
+        d = d.merge(subsetModelsWeights, left_on=['model'], right_on=['model'])
+        d = d.drop(columns = ['weight'])
+        d = d.rename(columns = {'renormWeight':'weight'})
+
+        print("Sum of weights after renorm = {:f}".format(d.loc[:,['model','weight']].drop_duplicates().weight.sum()))
+        
+        return d
+
 def captureSubmissionInformation(mostRecentSurviellanceWeek):
     EW = int(str(mostRecentSurviellanceWeek)[4:])
     today = datetime.datetime.today()
@@ -197,8 +215,16 @@ def sortEnsembleForecast(d):
     return d
 
 def grabForecastWeeks(forecasts):
-    return [int(x) for x in sorted(forecasts['EW'].unique())]
+     weeks = [int(x) for x in sorted(forecasts['EW'].unique())]
+     return weeks
 
+def transformFWeek2WeightWeek(forecastWeek):
+    from epiweeks import Week
+    year,week = int(str(forecastWeek)[:4]), int(str(forecastWeek)[4:])
+    week = Week(year,week)+2
+    return int("{:04d}{:02d}".format(week.year,week.week))
+
+ 
 if __name__ == "__main__":
 
     forecasts = pd.read_csv('./forecasts/flusightforecasts.csv')
@@ -213,11 +239,18 @@ if __name__ == "__main__":
         sys.stdout.flush()
 
         ew_forecasts = forecasts.loc[forecasts.EW==forecastWeek,:]
-        weights = allWts[allWts.forecastWeek==forecastWeek]
+        if ew_forecasts.shape[0]==0:
+            print('No forecast data for EW = {:d}'.format(forecastWeek))
+            continue
+        
+        weights = allWts[allWts.forecastWeek== transformFWeek2WeightWeek(forecastWeek)]
    
         forecastsAndWeights = ew_forecasts.merge(weights, left_on=['model'],right_on=['component_model_id'])
         forecastsAndWeights = reformatValueColumn(forecastsAndWeights)
     
+        forecastsAndWeights = renormalizeWeightsForModelsThatDontSubmit(forecastsAndWeights) 
+
+        forecastsAndWeights.value = forecastsAndWeights.value.astype(float)
         forecastsAndWeights['ensembleForecast'] = forecastsAndWeights.weight*forecastsAndWeights.value
         forecastsAndWeights = forecastsAndWeights.groupby(['EW','location','target','type','unit','bin_start_incl','bin_end_notincl']).apply( lambda x: pd.Series({'ensembleForecast':x.ensembleForecast.sum()}) ).reset_index()
     
@@ -231,4 +264,3 @@ if __name__ == "__main__":
     EW,year,month,day = captureSubmissionInformation(mostRecentSurviellanceWeek)
     allEnsembleForecasts.to_csv('./ensembleForecastsForBackfill/EW{:02d}-KoT-adaptive-{:d}-{:d}-{:d}.csv'.format(EW,year,month,day),index=False)
     allEnsembleForecasts.to_csv('./historicalEnsembleForecastsForBackfill/EW{:02d}-KoT-adaptive-{:d}-{:d}-{:d}.csv'.format(EW,year,month,day),index=False)
-    
