@@ -85,6 +85,7 @@ if __name__ == "__main__":
                 forecastsAndILI = forecastsForSingleWeekAheadTarget.merge( iliDataForEW, left_on = ['location'], right_on=['region'])
 
                 logScores = computeLogScores(forecastsAndILI,forecastWeek,iliEW)
+                logScores['surveillanceWeek1'] = surveillanceWeek
                 
                 allLogScores = allLogScores.append(logScores)
 

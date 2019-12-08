@@ -118,7 +118,11 @@ def grabForecastWeeks():
         weeks.append(weeks[-1]+1)
     formattedWeeks = [ int("{:04d}{:02d}".format(x.year,x.week)) for x in weeks]
     return formattedWeeks
- 
+
+def mostRecent(logScores):
+    L = logScores.groupby(['model','location','target','surveillanceWeek']).apply(lambda x: x.sort_values('releaseDate').iloc[-1])
+    L = L.drop(columns=['model','location','target','surveillanceWeek']).reset_index()
+    return L
     
 if __name__ == "__main__":
 
@@ -126,14 +130,14 @@ if __name__ == "__main__":
     singleBinLogScores = removeEnsembleModels(singleBinLogScores)
 
     allWts = pd.DataFrame()
-    for forecastWeek in grabForecastWeeks():
-        sys.stdout.write('\rForecast Week = {:d}\r'.format(forecastWeek))
-        sys.stdout.flush()
-        print('\rForecast Week = {:d}\r'.format(forecastWeek))
-        logScores = singleBinLogScores[singleBinLogScores.releaseEW==forecastWeek]
+    for releaseEW in [201942,201943]+sorted(singleBinLogScores.releaseEW.unique()):
+        print('\rRelease Week = {:f}\r'.format(releaseEW))
+        logScores = singleBinLogScores[singleBinLogScores.releaseEW<=releaseEW]
+        if logScores.shape[0]>0:
+            logScores = mostRecent(logScores)
         
         weights = computeAdaptiveWeights(logScores)
-        weights['forecastWeek'] = forecastWeek
+        weights['releaseEW'] = releaseEW
 
         allWts = allWts.append(weights)
         

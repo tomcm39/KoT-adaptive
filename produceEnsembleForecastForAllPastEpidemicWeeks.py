@@ -235,15 +235,14 @@ if __name__ == "__main__":
     forecastWeeks = grabForecastWeeks(forecasts)
     allEnsembleForecasts = pd.DataFrame()
     for (weekNum,forecastWeek) in enumerate(forecastWeeks):
-        sys.stdout.write('\r{:d}\r'.format(forecastWeek))
-        sys.stdout.flush()
+        print(forecastWeek)
 
         ew_forecasts = forecasts.loc[forecasts.EW==forecastWeek,:]
         if ew_forecasts.shape[0]==0:
             print('No forecast data for EW = {:d}'.format(forecastWeek))
             continue
         
-        weights = allWts[allWts.forecastWeek== transformFWeek2WeightWeek(forecastWeek)]
+        weights = allWts[allWts.releaseEW ==  forecastWeek] 
    
         forecastsAndWeights = ew_forecasts.merge(weights, left_on=['model'],right_on=['component_model_id'])
         forecastsAndWeights = reformatValueColumn(forecastsAndWeights)

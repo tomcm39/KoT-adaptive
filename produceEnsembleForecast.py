@@ -110,7 +110,7 @@ if __name__ == "__main__":
     
     weights   = pd.read_csv('./weights/adaptive-regularized-ensemble-constant.csv')
 
-    mostRecentSurviellanceWeek = 201945
+    mostRecentSurviellanceWeek = 201947
     forecastsAndWeights = forecasts.merge(weights, left_on=['model'],right_on=['component_model_id']) 
 
     try:
