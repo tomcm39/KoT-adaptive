@@ -64,7 +64,7 @@ EW2submissionFile =   {'EW42':'FilePATH'
                       ,'EW44':'FilePATH'
                       ,'EW45':'FilePATH'
                       ,'EW46':'FilePATH'
-                      ,'EW47':''FilePATH}
+                      ,'EW47':'FilePATH'}
 ```
 
 ### Step 4 - Submit forecast files
