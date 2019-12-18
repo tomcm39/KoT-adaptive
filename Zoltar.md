@@ -35,6 +35,11 @@ conn = connect2Zoltar()
 
 ### Step 2 - Create list of model and project identifying information
 
+Two variables are needed to submit a forecast: The name of the project (from the Zoltar Website) and name of your model.
+```
+project_name = 'CDC Real-time Forecasts'
+model_name   = 'KoT-adaptive'
+```
 
 ### Step 3 - Create dictionary of Epidemic weeks with forecasts and "time_zero" dates
 
