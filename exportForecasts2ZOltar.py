@@ -7,7 +7,7 @@ import os
 from glob import glob
 import re
 
-def connect2Zoltar:
+def connect2Zoltar():
     env_user='Z_USERNAME'
     env_pass='Z_PASSWORD'
     conn = ZoltarConnection()
