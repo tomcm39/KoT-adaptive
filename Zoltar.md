@@ -5,15 +5,15 @@
 The python package [zoltpy](https://pypi.org/project/zoltpy/) is used to upload forecasts to the Zoltar database.
 Uploading a forecast follows 4 steps:
 
-* [Step 1 - Connect to the Zoltar Server](#Step-1-Connect-to-the-Zoltar-Server)
-* [Step 2 - Create list of model and project identifying information](#Step-2-Create-list-of-model-and-project-identifying-information)
-* [Step 3 - Create dictionary of Epidemic weeks with forecasts and "timezero" dates](#Step-3-Create-dictionary-of-Epidemic-weeks-with-forecasts-and-"timezero"-dates)
-* [Step 4 - Submit forecast files](#Step-4-Submit-forecast-files)
+* [Step 1: Connect to the Zoltar Server](#Step-1:-Connect-to-the-Zoltar-Server)
+* [Step 2: Create list of model and project identifying information](#Step-2:-Create-list-of-model-and-project-identifying-information)
+* [Step 3: Create dictionary of Epidemic weeks with forecasts and "timezero" dates](#Step-3:-Create-dictionary-of-Epidemic-weeks-with-forecasts-and-"timezero"-dates)
+* [Step 4: Submit forecast files](#Step-4:-Submit-forecast-files)
 
-### Step 1 - Connect to the Zoltar Server
+### Step 1: Connect to the Zoltar Server
 
 To use Zoltar you need to obtain a username and password by contacting Professor Nicholas Reich (nick@schoolph.umass.edu), director of the Reich Lab.
-Details on how to securely store your username/password on your local machine can be found [here](https://github.com/reichlab/zoltpy) under the header **One-time Environment Variable Configuration**.
+Details on how to install zoltpy and securely store your username/password on your local machine can be found [here](https://github.com/reichlab/zoltpy) under the header **One-time Environment Variable Configuration**.
 
 Your python code will need to import two functions from Zoltpy:
 ```
@@ -34,7 +34,7 @@ def connect2Zoltar():
 conn = connect2Zoltar()
 ```
 
-### Step 2 - Create list of model and project identifying information
+### Step 2: Create list of model and project identifying information
 
 Two variables are needed to submit a forecast: The name of the project (from the Zoltar Website) and name of your model. It is important that these names match the names that are displayed on the Zoltar Website, else the upload will result in error. An example can be found below for the "KoT-adaptive" model within the "CDC Real-time Forecasts" project.
 ```
@@ -42,7 +42,7 @@ project_name = 'CDC Real-time Forecasts'
 model_name   = 'KoT-adaptive'
 ```
 
-### Step 3 - Create dictionary of Epidemic weeks with forecasts and "timezero" dates
+### Step 3: Create dictionary of Epidemic weeks with forecasts and "timezero" dates
 
 To submit past forecasts, a dictionary can be created of Epidemic Weeks (key) and time_zeroes (value).
 Every epidemic week has a Time\_Zero.
@@ -68,7 +68,7 @@ EW2submissionFile =   {'EW42':'FilePATH'
                       ,'EW47':'FilePATH'}
 ```
 
-### Step 4 - Submit forecast files
+### Step 4: Submit forecast files
 
 There are two methods in zoltpy that are always needed for uploading forecasts. The first is the helper function `util.convert_cdc_csv_to_json_io_dict` which will convert your csv file into a dictionary that is compatible with Zoltar. This helper function takes the path to your csv file and return the dictionary `predx_json` and the csv file name `forecast_filename`.
 
