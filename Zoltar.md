@@ -12,9 +12,9 @@ Uploading a forecast follows 4 steps:
 * [Step 4: Submit forecast files](#Step-4-Submit-forecast-files)
 
 ### Step 0: Install zoltpy
-Install zoltpy (if it is not already installed) using the following command:
+Install [the most recent development version of zoltpy](https://github.com/reichlab/zoltpy) (if it is not already installed) using the following command:
 ```
-pip install zoltpy
+pip install git+https://github.com/reichlab/zoltpy/
 ```
 
 ### Step 1: Connect to the Zoltar Server
