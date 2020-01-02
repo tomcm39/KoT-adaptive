@@ -5,10 +5,10 @@
 The python package [zoltpy](https://pypi.org/project/zoltpy/) is used to upload forecasts to the Zoltar database.
 Uploading a forecast follows 4 steps:
 
-* [Step 1: Connect to the Zoltar Server](#Step-1:-Connect-to-the-Zoltar-Server)
-* [Step 2: Create list of model and project identifying information](#Step-2:-Create-list-of-model-and-project-identifying-information)
-* [Step 3: Create dictionary of Epidemic weeks with forecasts and "timezero" dates](#Step-3:-Create-dictionary-of-Epidemic-weeks-with-forecasts-and-"timezero"-dates)
-* [Step 4: Submit forecast files](#Step-4:-Submit-forecast-files)
+* [Step 1: Connect to the Zoltar Server](#Step-1-Connect-to-the-Zoltar-Server)
+* [Step 2: Create list of model and project identifying information](#Step-2-Create-list-of-model-and-project-identifying-information)
+* [Step 3: Create dictionary of Epidemic weeks with forecasts and "timezero" dates](#Step-3-Create-dictionary-of-Epidemic-weeks-with-forecasts-and-"timezero"-dates)
+* [Step 4: Submit forecast files](#Step-4-Submit-forecast-files)
 
 ### Step 1: Connect to the Zoltar Server
 
