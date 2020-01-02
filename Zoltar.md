@@ -70,7 +70,7 @@ EW2submissionFile =   {'EW42':'FilePATH'
 
 ### Step 4: Submit forecast files
 
-There are two methods in zoltpy that are always needed for uploading forecasts. The first is the helper function `util.convert_cdc_csv_to_json_io_dict` which will convert your csv file into a dictionary that is compatible with Zoltar. This helper function takes the path to your csv file and return the dictionary `predx_json` and the csv file name `forecast_filename`.
+There are two methods in zoltpy that are always needed for uploading forecasts. The first is the helper function `util.convert_cdc_csv_to_json_io_dict` which will convert your csv file into a JSON that is compatible with Zoltar. This helper function takes the path to your csv file and return the JSON `predx_json` and the csv file name `forecast_filename`.
 
 The second method is the main upload function which is `util.upload_forecast`.
 The upload_forecast function takes these as input: an authenticated connection to Zoltar, a JSON format of your forecast, the name of the project, the name of your model, the timezero.
